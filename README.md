@@ -1,8 +1,8 @@
 # ZAnalaytics
 
-ZAnalytics is an open-source analytics service designed to help developers and businesses track user interactions, 
+Zanalytics is an open-source analytics service designed to help developers and businesses track user interactions, 
 monitor application performance, and gain insights into user behavior. Built with scalability and flexibility in mind, 
-ZAnalytics supports various data sources and provides real-time analytics capabilities.
+Zanalytics supports various data sources and provides real-time analytics capabilities.
 
 ## Features
 
@@ -32,3 +32,10 @@ control over data privacy and customization options, making it an ideal choice f
 their own analytics solutions.
 
 It integrates MCP (Model Context Protocol) to enhance data modeling and context management in order to provide more accurate and context-aware analytics.
+
+## Getting Started
+
+To get started with ZAnalytics, follow the installation instructions in the respective directories:
+
+- [Server Setup](./server/README.md)
+- [Frontend Setup](./frontend/README.md)

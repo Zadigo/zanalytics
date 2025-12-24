@@ -1,0 +1,36 @@
+{
+  "name": "zanalitics",
+  "version": "0.1.0",
+  "description": "Zanalytics is an open-source analytics service designed to help developers and businesses track user interactions, monitor application performance, and gain insights into user behavior",
+  "keywords": [
+    "analytics",
+    "seo",
+    "website",
+    "tracking",
+    "web",
+    "tracking"
+  ],
+  "homepage": "https://github.com/Zadigo/zanalytics#readme",
+  "bugs": {
+    "url": "https://github.com/Zadigo/zanalytics/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Zadigo/zanalytics.git"
+  },
+  "license": "MIT",
+  "author": "John Pendenque",
+  "type": "module",
+  "main": "src/index.ts",
+  "scripts": {
+    "build": "eslint . && tsc",
+    "rollup": "rollup src/index.ts -f cjs",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "@types/node": "^25.0.3",
+    "eslint": "^9.39.2",
+    "rollup": "^4.54.0",
+    "typescript": "^5.9.3"
+  }
+}
