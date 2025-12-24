@@ -5,22 +5,18 @@ import (
 	"log"
 	"time"
 
+	"github.com/Zadigo/zanalytics/utils"
+
 	amqp "github.com/rabbitmq/amqp091-go"
 )
-
-func failOnError(err error, msg string) {
-	if err != nil {
-		log.Panicf("%s: %s", msg, err)
-	}
-}
 
 // Function used to create a new RabbitMQ connection and channel
 func createRabbitChannel() (*amqp.Connection, *amqp.Channel, *amqp.Queue) {
 	conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
-	failOnError(err, "Failed to connect to RabbitMQ")
+	utils.FailOnError(err, "Failed to connect to RabbitMQ")
 
 	channel, err := conn.Channel()
-	failOnError(err, "Failed to open a channel")
+	utils.FailOnError(err, "Failed to open a channel")
 
 	q, err := channel.QueueDeclare(
 		"analytics_queue", // name
@@ -30,7 +26,7 @@ func createRabbitChannel() (*amqp.Connection, *amqp.Channel, *amqp.Queue) {
 		false,             // noWait
 		nil,               // args
 	)
-	failOnError(err, "Failed to declare a queue")
+	utils.FailOnError(err, "Failed to declare a queue")
 
 	return conn, channel, &q
 }
@@ -53,7 +49,7 @@ func PublishRabbitMessage(body string) error {
 			Body:        []byte(body),
 		},
 	)
-	failOnError(err, "Failed to publish a message")
+	utils.FailOnError(err, "Failed to publish a message")
 
 	return nil
 }
@@ -74,7 +70,7 @@ func RabbitConsumerServer() {
 		false, // no-wait
 		nil,   // args
 	)
-	failOnError(err, "Failed to register a consumer")
+	utils.FailOnError(err, "Failed to register a consumer")
 
 	var forever chan struct{}
 
