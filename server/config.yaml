@@ -17,20 +17,8 @@ config:
     database:
       client: postgres
     postgres:
-      url: null
-      username: null
-      password: null
-      host: null
-      port: 5432
+      url: "postgres://testuser:testpassword@localhost:5432"
     redis:
-      url: null
-      username: null
-      password: null
-      host: null
-      port: 6879
+      url: "redis://user:password@redis:6379/0"
     rabbitmq:
-      url: null
-      username: "guest"
-      password: "guest"
-      host: null
-      port: 5672
+      url: "rabbitmq://guest:guest@rabbitmq:"

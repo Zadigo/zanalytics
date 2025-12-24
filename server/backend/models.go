@@ -2,11 +2,7 @@ package backend
 
 // ServerBackendConfig represents the configuration for a specific backend in the YAML file
 type ServerBackendConfig struct {
-	Url      string "json:\"url\" yaml:\"url\""
-	Username string "json:\"username\" yaml:\"username\""
-	Password string "json:\"password\" yaml:\"password\""
-	Host     string "json:\"host\" yaml:\"host\""
-	Port     int    "json:\"port\" yaml:\"port\""
+	Url string "json:\"url\" yaml:\"url\""
 }
 
 // ServerBackendsConfig represents the backend configuration in the YAML file
@@ -24,13 +20,8 @@ type ServerConfig struct {
 	Config struct {
 		Endpoint     string "json:\"endpoint\" yaml:\"endpoint\""
 		Port         int    "json:\"port\" yaml:\"port\""
-		Environment  string "json:\"environment\" yaml:\"environment\""
-		ServiceName  string "json:\"service_name\" yaml:\"service_name\""
-		ServiceEmail string "json:\"service_email\" yaml:\"service_email\""
 		Username     string "json:\"username\" yaml:\"username\""
 		Password     string "json:\"password\" yaml:\"password\""
-	}
-	Client struct {
 		ClientId     string "json:\"client_id\" yaml:\"client_id\""
 		ClientToken  string "json:\"client_token\" yaml:\"client_token\""
 		MaxRetention int    "json:\"max_retention\" yaml:\"max_retention\""

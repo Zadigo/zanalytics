@@ -4,59 +4,31 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"strings"
 
 	"github.com/Zadigo/zanalytics/utils"
 	postGres "github.com/jackc/pgx/v5"
 )
 
 // Obtains a new connection to the Postgres database
-func NewPostgresDatabase(config *ServerBackendConfig) (*postGres.Conn, error) {
-	if config == nil {
-		return nil, fmt.Errorf("No Postgres configuration provided.")
-	}
-
-	if strings.TrimSpace(config.Host) == "" {
-		config.Host = "localhost"
-		log.Println("No Postgres host provided, defaulting to localhost.")
-	}
-
-	if config.Port == 0 || config.Port < 0 {
-		config.Port = 5432
-		log.Println("No Postgres port provided, defaulting to 5432.")
-	}
-
-	// Url matches the format: "postgres://user:password@localhost:5432/zanalytics"
-	if strings.TrimSpace(config.Url) == "" {
-		var connectionUrl string = "postgres://%s:%s@%s:%d/%s"
-
-		if (config.Username == "") || (config.Password == "") {
-			log.Panic("Postgres username or password not provided.")
-		}
-
-		connectionUrl = fmt.Sprintf(connectionUrl,
-			config.Username,
-			config.Password,
-			config.Host,
-			config.Port,
-			"zanalytics", // Default database name
-		)
-
-		config.Url = connectionUrl
+func NewPostgresDatabase(config *ServerBackendsConfig) (*postGres.Conn, error) {
+	if config.Database.Client == "postgres" && config.Postgres.Url == "" {
+		log.Panic("Postgres was selected as the database client but no URL was provided.")
 	}
 
 	// Create a new connection to the Postgres database
-	conn, err := postGres.Connect(context.Background(), config.Url)
+	var finalConnectionUrl string = config.Postgres.Url + "/zanalytics"
+	conn, err := postGres.Connect(context.Background(), finalConnectionUrl)
 
 	if err != nil {
 		return nil, fmt.Errorf("Unable to connect to database: %v\n", err)
 	}
 
+	log.Println("✔ Connected to Postgres database successfully.")
 	return conn, nil
 }
 
 // Creates necessary tables in the Postgres database
-func CreateTables(conn *postGres.Conn, config *ServerBackendConfig) {
+func CreateTables(conn *postGres.Conn, config *ServerConfig) {
 	eventsTableQuery := []string{
 		"events",
 		`
@@ -94,7 +66,7 @@ func CreateTables(conn *postGres.Conn, config *ServerBackendConfig) {
 		}
 	}
 
-	err := CreateUser(conn, config.Username, config.Password)
+	err := CreateUser(conn, config.Config.Username, config.Config.Password)
 
 	if err != nil {
 		fmt.Printf("Error creating admin user: %v\n", err)

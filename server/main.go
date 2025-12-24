@@ -91,7 +91,7 @@ func beforeStart() (*backend.ServerConfig, error) {
 	}
 
 	// Connect to the prefered database (Postgres, SQLite, etc.)
-	conn, err := backend.NewPostgresDatabase(content.Client.Backends.Postgres)
+	conn, err := backend.NewPostgresDatabase(content.Config.Backends)
 
 	if err != nil {
 		log.Fatalf("Failed to connect to Postgres database: %v\n", err)
