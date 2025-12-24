@@ -3,6 +3,8 @@ package backend
 import (
 	"context"
 	"fmt"
+	"log"
+	"strings"
 
 	"github.com/Zadigo/zanalytics/utils"
 	postGres "github.com/jackc/pgx/v5"
@@ -14,8 +16,23 @@ func NewPostgresDatabase(config *ServerBackendConfig) (*postGres.Conn, error) {
 		return nil, fmt.Errorf("No Postgres configuration provided.")
 	}
 
-	if config.Url != "" {
+	if strings.TrimSpace(config.Host) == "" {
+		config.Host = "localhost"
+		log.Println("No Postgres host provided, defaulting to localhost.")
+	}
+
+	if config.Port == 0 || config.Port < 0 {
+		config.Port = 5432
+		log.Println("No Postgres port provided, defaulting to 5432.")
+	}
+
+	// Url matches the format: "postgres://user:password@localhost:5432/zanalytics"
+	if strings.TrimSpace(config.Url) == "" {
 		var connectionUrl string = "postgres://%s:%s@%s:%d/%s"
+
+		if (config.Username == "") || (config.Password == "") {
+			log.Panic("Postgres username or password not provided.")
+		}
 
 		connectionUrl = fmt.Sprintf(connectionUrl,
 			config.Username,
@@ -28,6 +45,7 @@ func NewPostgresDatabase(config *ServerBackendConfig) (*postGres.Conn, error) {
 		config.Url = connectionUrl
 	}
 
+	// Create a new connection to the Postgres database
 	conn, err := postGres.Connect(context.Background(), config.Url)
 
 	if err != nil {
@@ -35,32 +53,6 @@ func NewPostgresDatabase(config *ServerBackendConfig) (*postGres.Conn, error) {
 	}
 
 	return conn, nil
-}
-
-// Creates a new user in the Postgres database
-func CreateUser(conn *postGres.Conn, username string, password string) error {
-	if (username != "") && (password != "") {
-		createAdminQuery := `
-		INSERT INTO accounts (email, password)
-		VALUES ($1, $2)
-		ON CONFLICT (email) DO NOTHING;
-		`
-
-		hashedPassword, err := utils.HashPassword(password)
-		if err != nil {
-			fmt.Printf("Error hashing password: %v\n", err)
-			return err
-		}
-
-		_, err = conn.Exec(context.Background(), createAdminQuery, username, hashedPassword)
-		if err != nil {
-			fmt.Printf("Error creating admin account: %v\n", err)
-		} else {
-			fmt.Println("Admin account created or already exists.")
-		}
-	}
-	
-	return nil
 }
 
 // Creates necessary tables in the Postgres database
@@ -107,6 +99,48 @@ func CreateTables(conn *postGres.Conn, config *ServerBackendConfig) {
 	if err != nil {
 		fmt.Printf("Error creating admin user: %v\n", err)
 	}
+}
+
+// Creates a new user in the Postgres database
+func CreateUser(conn *postGres.Conn, username string, password string) error {
+	if (username != "") && (password != "") {
+		createAdminQuery := `
+		INSERT INTO accounts (email, password)
+		VALUES ($1, $2)
+		ON CONFLICT (email) DO NOTHING;
+		`
+
+		hashedPassword, err := utils.HashPassword(password)
+		if err != nil {
+			fmt.Printf("Error hashing password: %v\n", err)
+			return err
+		}
+
+		_, err = conn.Exec(context.Background(), createAdminQuery, username, hashedPassword)
+		if err != nil {
+			fmt.Printf("Error creating admin account: %v\n", err)
+		} else {
+			fmt.Println("Admin account created or already exists.")
+		}
+	}
+
+	return nil
+}
+
+// A function used to authenticate a user in the Postgres database
+func AuthenticateUser(conn *postGres.Conn, username string, password string) bool {
+	authQuery := `SELECT password FROM accounts WHERE email=$1;`
+
+	var storedHashedPassword string
+	err := conn.QueryRow(context.Background(), authQuery, username).Scan(&storedHashedPassword)
+
+	if err != nil {
+		fmt.Printf("Error fetching user data: %v\n", err)
+		return false
+	}
+
+	isValid := utils.VerifyPassword(password, storedHashedPassword)
+	return isValid
 }
 
 // func InserValue(name string, conn *postGres.Conn) {}
