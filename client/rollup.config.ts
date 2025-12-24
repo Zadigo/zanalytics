@@ -1,4 +1,5 @@
-import type { RollupOptions } from 'rollup';
+import typescript from '@rollup/plugin-typescript';
+import type { RollupOptions } from 'rollup'
 
 export default {
   input: 'src/index.ts',
@@ -19,5 +20,10 @@ export default {
       name: 'Zanalytics',
       sourcemap: true,
     }
+  ],
+  plugins: [
+    typescript({
+      tsconfig: './tsconfig.json'
+    })
   ]
 } as RollupOptions
