@@ -1,0 +1,34 @@
+config:
+  endpoint: /v1/analytics
+  clientId: null
+  clientToken: null
+  max_retention: 100 # days
+  country: "FR"
+  timezone: "UTC"
+  legal:
+    policy_url: "http://example.com/policy"
+    privacy_url: "http://example.com/privacy"
+  domains:
+    - example.com
+    - example.fr
+  backends:
+    database:
+      client: postgres
+    postgres:
+      url: null
+      username: null
+      password: null
+      host: null
+      port: 5432
+    redis:
+      url: null
+      username: null
+      password: null
+      host: null
+      port: 6879
+    rabbitmq:
+      url: null
+      username: "guest"
+      password: "guest"
+      host: null
+      port: 5672
