@@ -24,7 +24,7 @@
   "main": "src/index.ts",
   "scripts": {
     "build": "eslint . && tsc",
-    "rollup": "rollup src/index.ts -f cjs",
+    "rollup": "rollup src/index.ts -f cjs -o dist/index.cjs && rollup src/index.ts -f esm -o dist/index.mjs",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {
