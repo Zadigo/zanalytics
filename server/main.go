@@ -2,8 +2,8 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
-	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -17,6 +17,22 @@ import (
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
+}
+
+// CORS middleware to handle cross-origin requests
+func Cors(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+
+		if r.Method == "OPTIONS" {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+
+		next(w, r)
+	}
 }
 
 // Handles websocket connections for live analytics data
@@ -67,8 +83,19 @@ func analyticsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	fmt.Fprint(w, string(body))
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+
+	var respone = struct {
+		Status  string `json:"status"`
+		Message string `json:"message"`
+	}{
+		Status:  "success",
+		Message: "Data received",
+	}
+	json.NewEncoder(w).Encode(respone)
+
+	log.Printf("Received %s", string(body))
 }
 
 func beforeStart() (*backend.ServerConfig, error) {
@@ -121,8 +148,8 @@ func main() {
 	log.Println("🫆 Websocket Endpoint: ws://127.0.0.1:9000/v1/analytics/live")
 
 	// Setting up HTTP handlers
-	http.HandleFunc("/v1/analytics", analyticsHandler)
-	http.HandleFunc("/v1/analytics/live", liveAnalyticsHandler)
+	http.HandleFunc("/v1/analytics", Cors(analyticsHandler))
+	http.HandleFunc("/v1/analytics/live", Cors(liveAnalyticsHandler))
 
 	// Perform pre-startup tasks
 	go beforeStart()
