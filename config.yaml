@@ -2,6 +2,8 @@ config:
   endpoint: /v1/analytics
   clientId: null
   clientToken: null
+  username: null
+  password: null
   max_retention: 100 # days
   country: "FR"
   timezone: "UTC"

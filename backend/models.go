@@ -27,6 +27,8 @@ type ServerConfig struct {
 		Environment  string "json:\"environment\" yaml:\"environment\""
 		ServiceName  string "json:\"service_name\" yaml:\"service_name\""
 		ServiceEmail string "json:\"service_email\" yaml:\"service_email\""
+		Username     string "json:\"username\" yaml:\"username\""
+		Password     string "json:\"password\" yaml:\"password\""
 	}
 	Client struct {
 		ClientId     string "json:\"client_id\" yaml:\"client_id\""
